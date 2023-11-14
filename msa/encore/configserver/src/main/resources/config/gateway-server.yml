@@ -1,0 +1,55 @@
+server:
+  port: 8072
+ 
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://eurekaserver:8070/eureka/
+      
+ 
+spring:
+  cloud:
+    loadbalancer.ribbon.enabled: false
+    gateway:
+      discovery.locator:
+        enabled: true
+        lowerCaseServiceId: true
+      routes:
+      - id: organization-service
+        uri: lb://organization-service
+        predicates:
+        - Path=/organization/**
+        filters:
+        - RewritePath=/organization/(?<path>.*), /$\{path}
+      - id: licensing-service
+        uri: lb://licensing-service
+        predicates:
+        - Path=/license/**
+        filters:
+        - RewritePath=/license/(?<path>.*), /$\{path}
+      - id: kbo-service
+        uri: lb://kbo-service
+        predicates:
+        - Path=/kbo/**
+        filters:
+        - RewritePath=/kbo/(?<path>.*), /$\{path}
+      - id: starbucks-service
+        uri: lb://starbucks-service
+        predicates:
+        - Path=/starbucks/**
+        filters:
+        - RewritePath=/starbucks/(?<path>.*), /$\{path}
+
+
+       
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+        
+        

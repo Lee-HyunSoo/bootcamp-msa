@@ -1,0 +1,133 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2023.10.23 14:16:14 =~=~=~=~=~=~=~=~=~=~=~=
+login as: root
+root@192.168.56.10's password: 
+Last login: Mon Oct 23 14:10:28 2023 from gateway
+[root@m-k8s ~]# ls
+anaconda-ks.cfg  ifcfg-enp0s8
+[root@m-k8s ~]# ls -al
+ 32
+dr-xr-x---.  5 root root  208 10 20 15:11 .
+dr-xr-xr-x. 17 root root  224 10 20 08:54 ..
+-rw-------.  1 root root 2555 10 20 15:20 .bash_history
+-rw-r--r--.  1 root root   18 12 29  2013 .bash_logout
+-rw-r--r--.  1 root root  176 12 29  2013 .bash_profile
+-rw-r--r--.  1 root root  176 12 29  2013 .bashrc
+-rw-r--r--.  1 root root  100 12 29  2013 .cshrc
+drwxr-xr-x.  2 root root   20 10 20 15:11 .kube
+drwxr-----.  3 root root   19 10 20 11:48 .pki
+drwx------.  2 root root   38 10 20 10:27 .ssh
+-rw-r--r--.  1 root root  129 12 29  2013 .tcshrc
+-rw-------.  1 root root 4025 10 20 12:31 .viminfo
+-rw-------.  1 root root 1317 10 20 08:55 anaconda-ks.cfg
+-rw-r--r--.  1 root root    0 10 20 09:41 ifcfg-enp0s8
+[root@m-k8s ~]# su k8s
+[k8s@m-k8s root]$ cd ~
+[k8s@m-k8s ~]$ clear
+[k8s@m-k8s ~]$ sudo kubeadm init --token 123456.1234567890123456 --token-ttl 0 \ \
+> --pod-network-cidr=172.16.0.0/16 --apiserver-advertise-address=192.168.56.10
+[sudo] k8s : 
+I1023 14:20:00.617835    9689 version.go:252] remote version is much newer: v1.28.2; falling back to: stable-1.18
+W1023 14:20:00.859262    9689 configset.go:202] WARNING: kubeadm cannot validate component configs for API groups [kubelet.config.k8s.io kubeproxy.config.k8s.io]
+[init] Using Kubernetes version: v1.18.20
+[preflight] Running pre-flight checks
+error execution phase preflight: [preflight] Some fatal errors occurred:
+[ERROR Port-6443]: Port 6443 is in use
+[ERROR Port-10259]: Port 10259 is in use
+[ERROR Port-10257]: Port 10257 is in use
+[ERROR FileAvailable--etc-kubernetes-manifests-kube-apiserver.yaml]: /etc/kubernetes/manifests/kube-apiserver.yaml already exists
+[ERROR FileAvailable--etc-kubernetes-manifests-kube-controller-manager.yaml]: /etc/kubernetes/manifests/kube-controller-manager.yaml already exists
+[ERROR FileAvailable--etc-kubernetes-manifests-kube-scheduler.yaml]: /etc/kubernetes/manifests/kube-scheduler.yaml already exists
+[ERROR FileAvailable--etc-kubernetes-manifests-etcd.yaml]: /etc/kubernetes/manifests/etcd.yaml already exists
+[ERROR Port-10250]: Port 10250 is in use
+[ERROR Port-2379]: Port 2379 is in use
+[ERROR Port-2380]: Port 2380 is in use
+[ERROR DirAvailable--var-lib-etcd]: /var/lib/etcd is not empty
+[preflight] If you know what you are doing, you can make a check non-fatal with `--ignore-preflight-errors=...`
+To see the stack trace of this error execute with --v=5 or higher
+[k8s@m-k8s ~]$ clear
+[k8s@m-k8s ~]$ kubectl get nodes
+NAME    STATUS   ROLES    AGE     VERSION
+m-k8s   Ready    master   2d23h   v1.18.4
+[k8s@m-k8s ~]$  kubectl get pods -n kube-system
+NAME                                      READY   STATUS    RESTARTS   AGE
+calico-kube-controllers-99c9b6f64-nfkjg   1/1     Running   1          2d23h
+calico-node-brfcf                         1/1     Running   1          2d23h
+coredns-66bff467f8-9vpvt                  1/1     Running   1          2d23h
+coredns-66bff467f8-blrx5                  1/1     Running   1          2d23h
+etcd-m-k8s                                1/1     Running   1          2d23h
+kube-apiserver-m-k8s                      1/1     Running   1          2d23h
+kube-controller-manager-m-k8s             1/1     Running   1          2d23h
+kube-proxy-7n522                          1/1     Running   1          2d23h
+kube-scheduler-m-k8s                      1/1     Running   1          2d23h
+[k8s@m-k8s ~]$ clearclear
+[k8s@m-k8s ~]$ ssh w1-k8s
+The authenticity of host 'w1-k8s (192.168.56.11)' can't be established.
+ECDSA key fingerprint is SHA256:VFzfgPyJjqhuICq/4M2YRrZbQP6RUzvEOZtPmKDAPWk.
+ECDSA key fingerprint is MD5:ab:7b:87:e6:05:d7:56:07:b8:17:4b:ae:45:7f:b5:3d.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'w1-k8s,192.168.56.11' (ECDSA) to the list of known hosts.
+Last login: Fri Oct 20 10:53:49 2023 from localhost
+[k8s@k8s-w1 ~]$ zexit
+logout
+Connection to w1-k8s closed.
+[k8s@m-k8s ~]$ ssh w1-k8sclear kubectl get pods -n kube-systemclearssh w1-k8sssh w1-k8s
+Last login: Mon Oct 23 14:24:34 2023 from m-k8s
+[k8s@k8s-w1 ~]$ sudo kubeadm join --token 123456.1234567890123456  --discovery-t oken-unsafe-skip-ca-verification 192.168.56.10:6443
+[sudo] k8s : 
+W1023 14:26:23.186904    2475 join.go:346] [preflight] WARNING: JoinControlPane.controlPlane settings will be ignored when control-plane flag is not set.
+[preflight] Running pre-flight checks
+[WARNING Hostname]: hostname "k8s-w1" could not be reached
+[WARNING Hostname]: hostname "k8s-w1": lookup k8s-w1 on 168.126.63.1:53: no such host
+[preflight] Reading configuration from the cluster...
+[preflight] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+[kubelet-start] Downloading configuration for the kubelet from the "kubelet-config-1.18" ConfigMap in the kube-system namespace
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Starting the kubelet
+[kubelet-start] Waiting for the kubelet to perform the TLS Bootstrap...
+
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+
+Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
+
+[k8s@k8s-w1 ~]$ [k8s@k8s-w1 ~]$ ssh w2-k8s
+The authenticity of host 'w2-k8s (192.168.56.12)' can't be established.
+ECDSA key fingerprint is SHA256:VFzfgPyJjqhuICq/4M2YRrZbQP6RUzvEOZtPmKDAPWk.
+ECDSA key fingerprint is MD5:ab:7b:87:e6:05:d7:56:07:b8:17:4b:ae:45:7f:b5:3d.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'w2-k8s,192.168.56.12' (ECDSA) to the list of known hosts.
+Last login: Fri Oct 20 16:37:00 2023 from m-k8s
+[k8s@w2-k8s ~]$ sudo kubeadm join --token 123456.1234567890123456  --discovery-token-unsafe-s kip-ca-verification 192.168.56.10:6443
+[sudo] k8s : 
+W1023 14:27:49.081109    2493 join.go:346] [preflight] WARNING: JoinControlPane.controlPlane settings will be ignored when control-plane flag is not set.
+[preflight] Running pre-flight checks
+[preflight] Reading configuration from the cluster...
+[preflight] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+[kubelet-start] Downloading configuration for the kubelet from the "kubelet-config-1.18" ConfigMap in the kube-system namespace
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Starting the kubelet
+[kubelet-start] Waiting for the kubelet to perform the TLS Bootstrap...
+
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+
+Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
+
+[k8s@w2-k8s ~]$ [k8s@w2-k8s ~]$ exoit
+logout
+Connection to w2-k8s closed.
+[k8s@k8s-w1 ~]$ exit
+logout
+Connection to w1-k8s closed.
+[k8s@m-k8s ~]$ get not kubectl get nodes
+NAME     STATUS   ROLES    AGE     VERSION
+k8s-w1   Ready    <none>   2m23s   v1.18.4
+m-k8s    Ready    master   2d23h   v1.18.4
+w2-k8s   Ready    <none>   64s     v1.18.4
+[k8s@m-k8s ~]$ cdchssh w1-k8s
+Last login: Mon Oct 23 14:26:09 2023 from m-k8s
+[k8s@k8s-w1 ~]$ m
